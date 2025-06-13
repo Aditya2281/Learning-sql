@@ -1,52 +1,25 @@
-select * from monarchs
+select * from orders
+select * from meals
+select * from stock
 
---Inner Join using On
+---Calculating Revenue
 SELECT
-	PRIME_MINISTERS.COUNTRY,
-	PRIME_MINISTERS.CONTINENT,
-	PRIME_MINISTER,
-	PRESIDENT
+	ORDER_ID,
+	SUM(MEAL_PRICE * ORDER_QUANTITY) AS REVENUE
 FROM
-	PRESIDENTS
-	INNER JOIN PRIME_MINISTERS ON PRESIDENTS.COUNTRY = PRIME_MINISTERS.COUNTRY
+	MEALS
+	JOIN ORDERS ON MEALS.MEAL_ID = ORDERS.MEAL_ID
+GROUP BY
+	ORDER_ID
 
---Inner Join using Aliased Tables 
-SELECT
-	P2.COUNTRY,
-	P2.CONTINENT,
-	PRIME_MINISTER,
-	PRESIDENT
-FROM
-	PRESIDENTS AS P1
-	INNER JOIN PRIME_MINISTERS AS P2 ON P1.COUNTRY = P2.COUNTRY
+---Calculating Cost 
+SELECT  
+  meal_id,   
+  SUM(meal_cost * stocked_quantity) AS total_cost   
+FROM meals  
+JOIN stock  using (meal_id)
+GROUP BY meal_id  
+ORDER BY total_cost DESC  
+LIMIT 3;
 
---Inner join using USING 
-SELECT
-	P2.COUNTRY,
-	P2.CONTINENT,
-	PRIME_MINISTER,
-	PRESIDENT
-FROM
-	PRESIDENTS AS P1
-	INNER JOIN PRIME_MINISTERS AS P2 USING (COUNTRY)
-
-
-
--- Join Example with USING
-SELECT p1.country, p1.continent,  
-       president, prime_minister 
-FROM prime_ministers AS p1 
-INNER JOIN presidents AS p2 
-USING(country);
-
---Chained Inner Joins with USING 
-SELECT
-	P1.COUNTRY,
-	P1.CONTINENT,
-	PRESIDENT,
-	PRIME_MINISTER,
-	PM_START
-FROM
-	PRIME_MINISTERS AS P1
-	INNER JOIN PRESIDENTS AS P2 USING (COUNTRY)
-	INNER JOIN PRIME_MINISTER_TERMS AS P3 USING (PRIME_MINISTER);
+---
