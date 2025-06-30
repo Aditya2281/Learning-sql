@@ -3,4 +3,4 @@ SELECT id, title, release_year, country, duration, language, certification, gros
 
 	select aditya;
    
-   SELECT  title from films;
+   SELECT  title from films;SELECT * FROM STOCK
