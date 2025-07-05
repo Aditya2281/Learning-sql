@@ -181,9 +181,92 @@ SELECT
 FROM user_revenues;
 
 
+----Orders per user:
+WITH user_orders AS ( 
+  SELECT 
+    user_id, 
+    COUNT(DISTINCT order_id) AS orders 
+  FROM meals 
+  JOIN orders ON meals.meal_id = orders.meal_id 
+  GROUP BY user_id
+)  
+SELECT 
+  orders, 
+  COUNT(DISTINCT user_id) AS users 
+FROM user_orders 
+GROUP BY orders 
+ORDER BY orders ASC;
+
+
+----Revenues rounded to 100s:
+WITH user_revenues AS ( 
+  SELECT 
+    user_id, 
+    SUM(meal_price * order_quantity) AS revenue 
+  FROM meals 
+  JOIN orders ON meals.meal_id = orders.meal_id 
+  GROUP BY user_id
+)  
+SELECT 
+  ROUND(revenue :: NUMERIC, -2) AS revenue_100, 
+  COUNT(DISTINCT user_id) AS users 
+FROM user_revenues 
+GROUP BY revenue_100 
+ORDER BY revenue_100 ASC;
 
 
 
+
+--------Bucketing
+---Top 5 order counts:
+WITH user_orders AS ( 
+  SELECT 
+    user_id, 
+    COUNT(DISTINCT order_id) AS orders 
+  FROM meals 
+  JOIN orders ON meals.meal_id = orders.meal_id 
+  GROUP BY user_id
+) 
+SELECT 
+  orders, 
+  COUNT(DISTINCT user_id) AS users 
+FROM user_orders 
+GROUP BY orders 
+ORDER BY orders ASC 
+LIMIT 5;
+
+
+---Meal price bucketing using CASE:
+SELECT 
+  CASE 
+    WHEN meal_price < 4 THEN 'Low-price meal' 
+    WHEN meal_price < 6 THEN 'Mid-price meal' 
+    ELSE 'High-price meal' 
+  END AS price_category, 
+  COUNT(DISTINCT meal_id) 
+FROM meals 
+GROUP BY price_category;
+
+
+
+----Revenue bucketing using CASE:
+WITH user_revenues AS ( 
+  SELECT 
+    user_id, 
+    SUM(meal_price * order_quantity) AS revenue 
+  FROM meals 
+  JOIN orders ON meals.meal_id = orders.meal_id 
+  GROUP BY user_id
+)  
+SELECT 
+  CASE 
+    WHEN revenue < 150 THEN 'Low-revenue users' 
+    WHEN revenue < 300 THEN 'Mid-revenue users' 
+    ELSE 'High-revenue users' 
+  END AS revenue_group, 
+  COUNT(DISTINCT user_id) AS users 
+FROM user_revenues 
+GROUP BY revenue_group;
 
 
 
