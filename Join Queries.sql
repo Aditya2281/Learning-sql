@@ -167,6 +167,21 @@ FROM kpis
 ORDER BY delivr_month ASC;
 
 
+---Query II (per user then average):
+WITH user_revenues AS ( 
+  SELECT 
+    user_id, 
+    SUM(meal_price * order_quantity) AS revenue 
+  FROM meals 
+  JOIN orders ON meals.meal_id = orders.meal_id 
+  GROUP BY user_id
+) 
+SELECT 
+  ROUND(AVG(revenue) :: NUMERIC, 2) AS arpu 
+FROM user_revenues;
+
+
+
 
 
 
